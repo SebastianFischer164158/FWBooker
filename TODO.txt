@@ -1,0 +1,3 @@
+TODO:
+Do a full 'crawl' of all center values and
+classes and transform to dict in script
