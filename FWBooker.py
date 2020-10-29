@@ -37,7 +37,7 @@ forum = centers.get('Forum')
 with Session() as s:
     login = s.post(site, login_data)
     content_of_resp = login.content
-    assert b"\"userLoginStatus\":\"loggedIn\"", "Error Not Logged In, Check Username+Password"
+    assert b"\"userLoginStatus\":\"loggedIn\"" in content_of_resp, "Error Not Logged In, Check Username+Password"
 
     request_url = "https://www.fitnessworld.com/dk2/api/search_activities?classes%5B%5D=23743&" \
                   f"classes%5B%5D=23742&classes%5B%5D=23741&centers%5B%5D={forum}&" \
