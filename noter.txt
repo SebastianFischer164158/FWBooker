@@ -1,0 +1,22 @@
+Login stuff:
+# Form data:
+# form_build_id: form-Kp7lr53EWjgme-FOXI9w-Kqi1yqxQMzj5HQnTGk6Xes
+# form_id: user_login_form
+# name: sebast
+# pass: sebast
+# redirect_url:
+# op: Log ind
+
+booking stuff:
+classes%5B%5D=23743&classes%5B%5D=23742&classes%5B%5D=23741&centers%5B%5D=164&from=2020-11-16&to=2020-11-17
+classes[]: 23743
+classes[]: 23742
+classes[]: 23741
+centers[]: 164
+from: 2020-11-16
+to: 2020-11-17
+
+
+
+// 24 hour loop stuff
+https://stackoverflow.com/questions/15088037/python-script-to-do-something-at-the-same-time-every-day
