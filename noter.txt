@@ -2,8 +2,8 @@ Login stuff:
 # Form data:
 # form_build_id: form-Kp7lr53EWjgme-FOXI9w-Kqi1yqxQMzj5HQnTGk6Xes
 # form_id: user_login_form
-# name: sebast
-# pass: sebast
+# name: X
+# pass: Y
 # redirect_url:
 # op: Log ind
 
@@ -16,7 +16,58 @@ centers[]: 164
 from: 2020-11-16
 to: 2020-11-17
 
+Booking af activity: POST:
+https://www.fitnessworld.com/dk2/api/book_activity
 
+form data:
+bookingId=164b133206&activityId=23742&payment_type=free
+parsed:
+bookingId: 164b133206
+activityId: 23742
+payment_type: free
+
+response : {"status":"success","participationId":"164pa3193700"}
+
+Unbook:
+https://www.fitnessworld.com/dk2/api/unbook_activity
+
+form data:
+participationId=164pa3193700
+parsed:
+participationId: 164pa3193700
+
+response : {"status":"success"}
 
 // 24 hour loop stuff
 https://stackoverflow.com/questions/15088037/python-script-to-do-something-at-the-same-time-every-day
+
+
+
+
+///
+
+
+# def job():
+#     print("Im working")
+#
+#
+# schedule.every().minute.at(":17").do(job)
+# while True:
+#     schedule.run_pending()
+#     time.sleep(1)
+#
+
+possible class structure
+
+class FW:
+FW.login()
+FW.BookActivity(name)
+
+## if argparser is introduced
+# and unbooking is wished then just start a new session tbh.
+
+
+
+https://stackoverflow.com/questions/12737740/python-requests-and-persistent-sessions/37118451
+https://stackoverflow.com/questions/12737740/python-requests-and-persistent-sessions
+https://stackoverflow.com/questions/13030095/how-to-save-requests-python-cookies-to-a-file
