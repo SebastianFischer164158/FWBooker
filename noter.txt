@@ -71,3 +71,51 @@ FW.BookActivity(name)
 https://stackoverflow.com/questions/12737740/python-requests-and-persistent-sessions/37118451
 https://stackoverflow.com/questions/12737740/python-requests-and-persistent-sessions
 https://stackoverflow.com/questions/13030095/how-to-save-requests-python-cookies-to-a-file
+
+  7 
+  8 sf@sf:~$ python3
+  9 Python 3.8.5 (default, )                     
+ 10 [GCC 9.3.0] on linux
+ 11 Type "help", "copyright", "credits" or "license" for more information.
+ 12 >>> import schedule
+ 13 >>> import time
+ 14 >>> def job(jobcomment):
+ 15 ...     print("I am working per 1 minute" + jobcomment)
+ 16 ...     return
+ 17 ... 
+ 18 >>> schedule.every(1).minutes.do(job,'TEST')
+ 19 Every 1 minute do job('TEST') (last run: [never], next run: 2020-11-23 10:09:06)
+ 20 >>> while True:
+ 21 ...     schedule.run_pending()
+ 22 ...  
+ 23 I am working per 1 minuteTEST
+ 24 I am working per 1 minuteTEST
+ 25 I am working per 1 minuteTEST
+ 26 I am working per 1 minuteTEST
+ 27 I am working per 1 minuteTEST
+ 28 I am working per 1 minuteTEST
+ 29 I am working per 1 minuteTEST
+ 30 I am working per 1 minuteTEST
+ 31 I am working per 1 minuteTEST 
+ 32 ^CTraceback (most recent call last):
+ 33   File "<stdin>", line 2, in <module>
+ 34 KeyboardInterrupt
+ 35 >>> exit()
+ 36 
+
+
+
+
+
+https://stackoverflow.com/questions/15088037/python-script-to-do-something-at-the-same-time-every-day
+nohup python3 MyScheduledProgram.py &
+https://www.computerhope.com/unix/unohup.htm
+Don't forget to start it again if you reboot.
+
+
+# possible thing to do.
+set script to execute at 00:00:X
+and then
+set a kill switch for 00:05
+
+set at boot that the pc starts the script
