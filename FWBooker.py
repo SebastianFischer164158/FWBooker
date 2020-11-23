@@ -1,7 +1,9 @@
-import json
-
+import schedule
+import time
 from requests import Session
 from schedule import *
+
+DAY_OFFSET = 21
 
 # should probably be held in a csv file or similar.
 classes_dict = {
@@ -82,22 +84,20 @@ def unbook_activity(session_, particiID):
         raise Exception(f"Could not unbook  {particiID}")
 
 
-if __name__ == "__main__":
-    session = login_to_fw(username="X",
-                          password="Y")
-    Forum = centers_dict.get('Forum')
-    dayoffset = 21
+def login_and_book(username: str, password: str, centerID: str, classes):
+    print(f"{login_and_book.__name__} executed at {datetime.datetime.now()}")
+    orig_session = login_to_fw(username=username, password=password)
+
     # for the query, fw allows 21 days reach at 00:00
-    opendate = (datetime.datetime.now() + datetime.timedelta(days=21))
+    opendate = (datetime.datetime.now() + datetime.timedelta(days=DAY_OFFSET))
     future_yr = opendate.year
     future_mnth = opendate.month
     future_day = opendate.day
 
-    psb_bookings = retrieve_class(session_=session, center=Forum,
+    psb_bookings = retrieve_class(session_=orig_session, center=centerID,
                                   year=future_yr, month=future_mnth,
                                   dayx=future_day, dayy=future_day,
-                                  classes=['Bike Base', 'Bike Standard',
-                                           'Bike Edge'])
+                                  classes=classes)
     print(psb_bookings)
 
     possible_classes = psb_bookings['items']
@@ -106,12 +106,30 @@ if __name__ == "__main__":
 
     participationIDs = []
     for activityID, bookingID in ac_bk_IDs:
-        resp = book_an_activity(session_=session, bookingID=bookingID,
+        resp = book_an_activity(session_=orig_session, bookingID=bookingID,
                                 activityID=activityID)
         participationIDs.append(resp)
 
     print(participationIDs)
+    return 0
 
-    for participationID in participationIDs:
-        unbook_activity(session_=session, particiID=participationID)
+    # for participationID in participationIDs:
+    #     unbook_activity(session_=orig_session, particiID=participationID)
 
+
+if __name__ == "__main__":
+    Forum = centers_dict.get('Forum')
+    classes = ['Bike Base', 'Bike Standard', 'Bike Edge']
+    random_element = random.randint(1, 59)
+    random_element = '0' + str(random_element) if random_element <= 9 \
+        else str(random_element)
+    starttime = f'00:00:{random_element}'
+    # login_and_book(username = "",password = "", centerID = Forum,classes = classes)
+    schedule.every().day.at(starttime).do(login_and_book, username="",
+                                          password="", centerID=Forum,
+                                          classes=classes)
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
+    # do check with ps auxf | grep python and check if it is scheduled
+    # if it is not there then cat nohup txt file and check the "log"
