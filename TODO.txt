@@ -3,4 +3,8 @@ Do a full 'crawl' of all center values and
 classes and transform to dict in script
 
 
-test commmitblabla
+Move to either
+https://eu.pythonanywhere.com/
+
+or setup an azure free account
+https://stackoverflow.com/questions/45716757/options-for-running-python-scripts-in-azure
