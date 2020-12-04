@@ -34,6 +34,7 @@ def login_to_fw(username, password):
     with Session() as sess:
         login = sess.post(site_url, login_data)
         content_of_resp = login.content
+        print(content_of_resp)
         if b"\"userLoginStatus\":\"loggedIn\"" not in content_of_resp:
             raise Exception("Error Not Logged In, Check Username+Password")
         else:
@@ -43,6 +44,7 @@ def login_to_fw(username, password):
 def retrieve_class(session_, center, year, month, dayx, dayy, classes):
     class_string = ''
     class_prefix = 'classes%5B%5D='
+    possible_bookings = {}
     for a_class in classes:
         classID = classes_dict.get(a_class)
         class_string += class_prefix + classID + '&'
@@ -51,7 +53,21 @@ def retrieve_class(session_, center, year, month, dayx, dayy, classes):
                   f"{class_string}centers%5B%5D={center}&" \
                   f"from={year}-{month}-{dayx}&to={year}-{month}-{dayy}"
     response = session_.get(request_url)
-    possible_bookings = response.json()[0]
+    print("Response -> ", response)
+    responsestatuscode = -1
+    while responsestatuscode != 200:
+        try:
+            responsestatuscode = response.status_code
+            print("(response.json()[0] -> ", response.json()[0])
+            possible_bookings = response.json()[0]
+        except Exception as e:
+            print("Got exception ->  ", e)
+            continue
+    if responsestatuscode == 200 and len(possible_bookings) == 0:
+        print("No bookings available on this date!")
+    elif responsestatuscode == 200:
+        print("Possible bookings -> ", possible_bookings)
+
     return possible_bookings
 
 
@@ -98,11 +114,16 @@ def login_and_book(username: str, password: str, centerID: str, classes):
                                   year=future_yr, month=future_mnth,
                                   dayx=future_day, dayy=future_day,
                                   classes=classes)
-    print(psb_bookings)
+
+    if len(psb_bookings) == 0:
+        print("No classes possible to book")
+        return -1
 
     possible_classes = psb_bookings['items']
+
+    print("Possible classes -> ", possible_classes)
     ac_bk_IDs = [(x['activityId'], x['bookingId']) for x in possible_classes]
-    print(ac_bk_IDs)
+    print("AC_BK_IDS -> ", ac_bk_IDs)
 
     participationIDs = []
     for activityID, bookingID in ac_bk_IDs:
@@ -110,26 +131,40 @@ def login_and_book(username: str, password: str, centerID: str, classes):
                                 activityID=activityID)
         participationIDs.append(resp)
 
-    print(participationIDs)
+    print("Participation IDs -> ", participationIDs)
     return 0
 
     # for participationID in participationIDs:
     #     unbook_activity(session_=orig_session, particiID=participationID)
 
 
+"""
+IDE:
+
+for idx,time in enumerate(test['items']):
+    if time['startTime']< '17:00':
+        print(test['items'][idx])
+        del test['items'][idx]
+
+
+"""
+
 if __name__ == "__main__":
     Forum = centers_dict.get('Forum')
     classes = ['Bike Base', 'Bike Standard', 'Bike Edge']
-    random_element = random.randint(1, 59)
+    random_element = random.randint(1, 9)
     random_element = '0' + str(random_element) if random_element <= 9 \
         else str(random_element)
     starttime = f'00:00:{random_element}'
-    # login_and_book(username = "",password = "", centerID = Forum,classes = classes)
-    schedule.every().day.at(starttime).do(login_and_book, username="",
-                                          password="", centerID=Forum,
-                                          classes=classes)
-    while True:
-        schedule.run_pending()
-        time.sleep(1)
+    username = "YY"
+    password = "XX"
+    login_and_book(username=username, password=password, centerID=Forum,
+                   classes=classes)
+    # schedule.every().day.at(starttime).do(login_and_book, username=username,
+    #                                       password=password, centerID=Forum,
+    #                                       classes=classes)
+    # while True:
+    #     schedule.run_pending()
+    #     time.sleep(1)
     # do check with ps auxf | grep python and check if it is scheduled
     # if it is not there then cat nohup txt file and check the "log"
