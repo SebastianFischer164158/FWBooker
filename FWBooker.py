@@ -1,5 +1,4 @@
 import schedule
-import time
 from requests import Session
 from schedule import *
 
