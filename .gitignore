@@ -131,3 +131,7 @@ dmypy.json
 .pyre/
 
 nohup.out
+
+password.txt
+
+username.txt
