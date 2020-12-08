@@ -139,15 +139,23 @@ if __name__ == "__main__":
     random_element = '0' + str(random_element) if random_element <= 9 \
         else str(random_element)
     starttime = f'00:00:{random_element}'
-    username = "YY"
-    password = "XX"
-    login_and_book(username=username, password=password, centerID=Forum,
-                   classes=classes)
-    # schedule.every().day.at(starttime).do(login_and_book, username=username,
-    #                                       password=password, centerID=Forum,
-    #                                       classes=classes)
-    # while True:
-    #     schedule.run_pending()
-    #     time.sleep(1)
-    # do check with ps auxf | grep python and check if it is scheduled
-    # if it is not there then cat nohup txt file and check the "log"
+
+    # could probably also just be done with enviornment variables
+    # but this seemed more convient tbh
+    with open("username.txt", "r") as username_file:
+        username = username_file.read()
+    with open("password.txt", "r") as password_file:
+        password = username_file.read()
+
+    # login_and_book(user_name=username, pwd=password, centerID=Forum,
+    #                classes_for_user=classes)
+    schedule.every().day.at(starttime).do(job_func=login_and_book,
+                                          username=username,
+                                          password=password,
+                                          centerID=Forum,
+                                          classes_for_user=classes)
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
+    # # # do check with ps auxf | grep python and check if it is scheduled
+    # # if it is not there then cat nohup txt file and check the "log"
