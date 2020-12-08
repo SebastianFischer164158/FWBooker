@@ -2,18 +2,10 @@ import schedule
 from requests import Session
 from schedule import *
 
-DAY_OFFSET = 21
+from constants import classes_dict, DAY_OFFSET, centers_dict
 
-# should probably be held in a csv file or similar.
-classes_dict = {
-    'Bike Base': '23741',
-    'Bike Standard': '23742',
-    'Bike Edge': '23743'
-}
 
 centers_dict = {
-    'Forum': '164'
-}
 
 
 def login_to_fw(username, password):
