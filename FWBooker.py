@@ -1,3 +1,5 @@
+from typing import List
+
 import schedule
 from requests import Session
 from schedule import *
@@ -5,10 +7,7 @@ from schedule import *
 from constants import classes_dict, DAY_OFFSET, centers_dict
 
 
-centers_dict = {
-
-
-def login_to_fw(username, password):
+def login_to_fw(user_name: str, pwd: str) -> Session:
     site_url = "https://www.fitnessworld.com/dk2/?destination=/dk2/front" \
                "%3Fgclid%3DEAIaIQobChMIkqr5ypHQ7AIVi9eyCh1SuAOAEAMYASAAE" \
                "gKKovD_BwE "
@@ -16,8 +15,8 @@ def login_to_fw(username, password):
     login_data = {
         "form_build_id": "form-Kp7lr53EWjgme-FOXI9w-Kqi1yqxQMzj5HQnTGk6Xes",
         "form_id": "user_login_form",
-        "name": username,
-        "pass": password,
+        "name": user_name,
+        "pass": pwd,
         "redirect_url": "",
         "op": "Log+ind"
     }
@@ -32,44 +31,46 @@ def login_to_fw(username, password):
             return sess
 
 
-def retrieve_class(session_, center, year, month, dayx, dayy, classes):
+def retrieve_class(curr_session: Session, center: str, year: int,
+                   month: int, dayx: int, dayy: int,
+                   classes_for_user: List[str]):
     class_string = ''
     class_prefix = 'classes%5B%5D='
-    possible_bookings = {}
-    for a_class in classes:
+    # possible_bookings = {}
+    for a_class in classes_for_user:
         classID = classes_dict.get(a_class)
         class_string += class_prefix + classID + '&'
 
     request_url = "https://www.fitnessworld.com/dk2/api/search_activities?" \
                   f"{class_string}centers%5B%5D={center}&" \
                   f"from={year}-{month}-{dayx}&to={year}-{month}-{dayy}"
-    response = session_.get(request_url)
+    response = curr_session.get(request_url)
     print("Response -> ", response)
-    responsestatuscode = -1
-    while responsestatuscode != 200:
-        try:
-            responsestatuscode = response.status_code
-            print("(response.json()[0] -> ", response.json()[0])
-            possible_bookings = response.json()[0]
-        except Exception as e:
-            print("Got exception ->  ", e)
-            continue
+
+    responsestatuscode = response.status_code
+    print("(response.json()[0] -> ", response.json()[0])
+    possible_bookings = response.json()[0]
+
     if responsestatuscode == 200 and len(possible_bookings) == 0:
         print("No bookings available on this date!")
     elif responsestatuscode == 200:
+        print("type of possible_bookings -> ", type(possible_bookings))
         print("Possible bookings -> ", possible_bookings)
 
     return possible_bookings
 
 
-def book_an_activity(session_, bookingID, activityID):
+def book_an_activity(curr_session: Session, bookingID, activityID):
     booking_url = 'https://www.fitnessworld.com/dk2/api/book_activity'
+    print("Type of booking ID -> ", type(bookingID))
+    print("Type of activityID ID -> ", type(activityID))
+
     booking_data = {
         'bookingId': bookingID,
         'activityId': activityID,
         'payment_type': 'free'
     }
-    booking_resp = session_.post(booking_url, booking_data).json()
+    booking_resp = curr_session.post(booking_url, booking_data).json()
     print(" ----> ", booking_resp)
 
     if booking_resp['status'] == 'success':
@@ -80,10 +81,10 @@ def book_an_activity(session_, bookingID, activityID):
                         f"bookingID {bookingID}")
 
 
-def unbook_activity(session_, particiID):
+def unbook_activity(curr_session: Session, particiID: str) -> int:
     unbooking_url = 'https://www.fitnessworld.com/dk2/api/unbook_activity'
     unbooking_data = {'participationId': particiID}
-    unbooking_resp = session_.post(unbooking_url, unbooking_data).json()
+    unbooking_resp = curr_session.post(unbooking_url, unbooking_data).json()
     if unbooking_resp['status'] == 'success':
         print(f"Unbooked with ParticipationID {particiID}")
         return 0
@@ -91,9 +92,10 @@ def unbook_activity(session_, particiID):
         raise Exception(f"Could not unbook  {particiID}")
 
 
-def login_and_book(username: str, password: str, centerID: str, classes):
+def login_and_book(user_name: str, pwd: str, centerID: str,
+                   classes_for_user: List[str]) -> int:
     print(f"{login_and_book.__name__} executed at {datetime.datetime.now()}")
-    orig_session = login_to_fw(username=username, password=password)
+    orig_session = login_to_fw(user_name=user_name, pwd=pwd)
 
     # for the query, fw allows 21 days reach at 00:00
     opendate = (datetime.datetime.now() + datetime.timedelta(days=DAY_OFFSET))
@@ -101,10 +103,10 @@ def login_and_book(username: str, password: str, centerID: str, classes):
     future_mnth = opendate.month
     future_day = opendate.day
 
-    psb_bookings = retrieve_class(session_=orig_session, center=centerID,
+    psb_bookings = retrieve_class(curr_session=orig_session, center=centerID,
                                   year=future_yr, month=future_mnth,
                                   dayx=future_day, dayy=future_day,
-                                  classes=classes)
+                                  classes_for_user=classes_for_user)
 
     if len(psb_bookings) == 0:
         print("No classes possible to book")
@@ -118,7 +120,7 @@ def login_and_book(username: str, password: str, centerID: str, classes):
 
     participationIDs = []
     for activityID, bookingID in ac_bk_IDs:
-        resp = book_an_activity(session_=orig_session, bookingID=bookingID,
+        resp = book_an_activity(curr_session=orig_session, bookingID=bookingID,
                                 activityID=activityID)
         participationIDs.append(resp)
 
