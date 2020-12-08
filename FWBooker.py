@@ -131,16 +131,6 @@ def login_and_book(user_name: str, pwd: str, centerID: str,
     #     unbook_activity(session_=orig_session, particiID=participationID)
 
 
-"""
-IDE:
-
-for idx,time in enumerate(test['items']):
-    if time['startTime']< '17:00':
-        print(test['items'][idx])
-        del test['items'][idx]
-
-
-"""
 
 if __name__ == "__main__":
     Forum = centers_dict.get('Forum')
