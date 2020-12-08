@@ -119,3 +119,16 @@ and then
 set a kill switch for 00:05
 
 set at boot that the pc starts the script
+
+
+
+"""
+IDE:
+
+for idx,time in enumerate(test['items']):
+    if time['startTime']< '17:00':
+        print(test['items'][idx])
+        del test['items'][idx]
+
+
+"""
